@@ -1,0 +1,28 @@
+---
+- name: Ensure directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/nvue.d
+    - /etc/udev/rules.d
+
+- name: Copy config files
+  copy:
+    src: "{{ playbook_dir }}/../generated/configs/{{ inventory_hostname }}/{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { src: "startup.yaml", dest: "/etc/nvue.d/startup.yaml" }
+    - { src: "70-fabric.rules", dest: "/etc/udev/rules.d/70-fabric.rules" }
+  ignore_errors: yes
+
+- name: Reload udev (pick up interface renames)
+  command: "{{ item }}"
+  loop:
+    - udevadm control --reload
+    - udevadm trigger --subsystem-match=net
+  ignore_errors: yes
+
+- name: Apply NVUE startup config
+  command: nv config apply --assume-yes startup
+  ignore_errors: yes

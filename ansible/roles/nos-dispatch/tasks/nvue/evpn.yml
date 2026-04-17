@@ -1,0 +1,4 @@
+---
+- name: "NVUE EVPN is deferred"
+  debug:
+    msg: "nos-dispatch/nvue/evpn.yml is a stub; EVPN on Cumulus VX not wired yet. See ROADMAP."
