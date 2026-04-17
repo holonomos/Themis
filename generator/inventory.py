@@ -82,6 +82,12 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         for node in topology["nodes"].values()
     ]
 
+    dhcp_reservations = [
+        {"name": node["name"], "ip": node["mgmt_ip"], "mac": node["mgmt_mac"]}
+        for node in topology["nodes"].values()
+        if node.get("bootstrap", {}).get("mode") == "dhcp"
+    ]
+
     all_vars = {
         "platform": platform["name"],
         "project_name": project_name,
@@ -99,6 +105,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         ),
         "all_links": all_links,
         "reservations": reservations,
+        "dhcp_reservations": dhcp_reservations,
     }
     with open(os.path.join(group_vars_dir, "all.yml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(all_vars, f, sort_keys=False)
@@ -115,25 +122,30 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         yaml.safe_dump(control_vars, f, sort_keys=False)
         
     for name, node in topology["nodes"].items():
-        if node["role"] in ("bastion", "services", "orchestrator", "telemetry", "registry"):
-            continue
-
         if node.get("type") == "frr-vm":
             nos_type = node.get("nos_type") or platform["nos"]
         else:
             nos_type = None
+
+        profile = platform.get("resource_profiles", {}).get(node["role"], {})
+
+        interfaces = [
+            {**iface, "bridge": iface["bridge"].replace("<project-name>", project_name)}
+            for iface in node.get("interfaces", [])
+        ]
 
         hvars = {
             "role": node["role"],
             "nos_type": nos_type,
             "asn": node.get("asn"),
             "loopback": node.get("loopback"),
-            "vcpu": node.get("vcpu", 1),
-            "memory_mb": node.get("memory_mb", 256),
-            "disk_gb": node.get("disk_gb", 3),
+            "vcpu": profile.get("vcpu", node.get("vcpu", 1)),
+            "memory_mb": profile.get("memory_mb", node.get("memory_mb", 256)),
+            "disk_gb": profile.get("disk_gb", node.get("disk_gb", 3)),
             "mgmt_mac": node["mgmt_mac"],
-            "interfaces": node.get("interfaces", []),
-            "bgp_neighbors": node.get("bgp_neighbors", [])
+            "interfaces": interfaces,
+            "bgp_neighbors": node.get("bgp_neighbors", []),
+            "bootstrap": node.get("bootstrap", {"mode": "dhcp"}),
         }
         if not hvars["nos_type"]:
             hvars.pop("nos_type")
