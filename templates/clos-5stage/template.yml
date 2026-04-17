@@ -2,6 +2,11 @@ name: clos-5stage
 display_name: "5-Stage Clos (Pod-based: Border + Super-Spine + Spine + Leaf + Server)"
 
 parameters:
+  border_count:
+    type: integer
+    default: 2
+    min: 1
+    max: 4
   super_spine_count:
     type: integer
     default: 2
@@ -29,7 +34,6 @@ parameters:
     max: 4
 
 fixed:
-  border_count: 2
   leafs_per_rack: 2
   control_plane_nodes:
     - { name: bastion,      role: bastion,      mgmt_ip: "192.168.0.2" }

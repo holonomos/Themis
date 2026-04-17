@@ -41,11 +41,11 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
     nodes = {}
     links = []
     
+    border_count = parameters["border_count"]
     spine_count = parameters["spine_count"]
     rack_count = parameters["rack_count"]
     servers_per_rack = parameters["servers_per_rack"]
-    
-    border_count = meta["fixed"]["border_count"]
+
     leafs_per_rack = meta["fixed"]["leafs_per_rack"]
     control_nodes = meta["fixed"]["control_plane_nodes"]
     

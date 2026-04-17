@@ -2,6 +2,11 @@ name: clos-3tier
 display_name: "3-Tier Clos (Border + Spine + Leaf + Server)"
 
 parameters:
+  border_count:
+    type: integer
+    default: 2
+    min: 1
+    max: 4
   spine_count:
     type: integer
     default: 2
@@ -19,7 +24,6 @@ parameters:
     max: 8
 
 fixed:
-  border_count: 2
   leafs_per_rack: 2
   control_plane_nodes:
     - { name: bastion,      role: bastion,      mgmt_ip: "192.168.0.2" }

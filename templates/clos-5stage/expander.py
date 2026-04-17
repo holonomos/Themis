@@ -42,13 +42,13 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
     nodes = {}
     links = []
     
+    border_count = parameters["border_count"]
     super_spine_count = parameters["super_spine_count"]
     pod_count = parameters["pod_count"]
     spines_per_pod = parameters["spines_per_pod"]
     racks_per_pod = parameters["racks_per_pod"]
     servers_per_rack = parameters["servers_per_rack"]
-    
-    border_count = meta["fixed"]["border_count"]
+
     leafs_per_rack = meta["fixed"]["leafs_per_rack"]
     control_nodes = meta["fixed"]["control_plane_nodes"]
     
