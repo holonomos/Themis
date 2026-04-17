@@ -1,0 +1,5 @@
+---
+- include_tasks: link-down.yml
+- pause:
+    seconds: "{{ flap_duration_s | default(5) }}"
+- include_tasks: link-up.yml

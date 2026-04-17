@@ -1,0 +1,28 @@
+# ClosWatch — dnsmasq configuration
+# Generated from topology.yml — DO NOT HAND-EDIT
+#
+# Authoritative DNS server for the OOB management network.
+# Resolves hostname.{{ domain }} → management IP for all {{ reservations|length }} nodes.
+# Static mgmt IPs on guests; dnsmasq provides authoritative DNS only (no libvirt DHCP).
+
+# --- General ---
+domain={{ domain }}
+local=/{{ domain }}/
+expand-hosts
+no-resolv
+bogus-priv
+
+# --- Upstream DNS (optional; for guest outbound resolution if enabled) ---
+server=1.1.1.1
+server=8.8.8.8
+
+# --- DNS only ---
+port=53
+
+# --- DNS entries (hostname → management IP) ---
+{% for res in reservations %}
+address=/{{ res.name }}.{{ domain }}/{{ res.ip }}
+{% endfor %}
+
+# --- Logging ---
+log-queries

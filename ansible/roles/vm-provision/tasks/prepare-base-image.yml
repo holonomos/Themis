@@ -1,0 +1,33 @@
+---
+- name: Assert base_image_path is set
+  assert:
+    that: base_image_path | length > 0
+    fail_msg: "base_image_path must be set in group_vars/all.yml"
+
+- name: Extract qcow2 from .box
+  command: tar -xf {{ base_image_path }} box.img
+  args:
+    chdir: /tmp
+    creates: /tmp/box.img
+
+- name: Ensure libvirt images directory exists
+  file:
+    path: /var/lib/libvirt/images
+    state: directory
+    mode: '0755'
+
+- name: Copy extracted box.img to libvirt pool
+  command: cp /tmp/box.img /var/lib/libvirt/images/{{ project_name }}-base.qcow2
+  args:
+    creates: /var/lib/libvirt/images/{{ project_name }}-base.qcow2
+
+- name: Ensure default pool is active
+  community.libvirt.virt_pool:
+    command: start
+    name: default
+  ignore_errors: yes
+
+- name: Refresh libvirt pool
+  community.libvirt.virt_pool:
+    command: refresh
+    name: default

@@ -1,0 +1,19 @@
+---
+- set_fact:
+    rack_id: "{{ rack | regex_replace('^rack-', '') }}"
+
+- set_fact:
+    leafs:
+      - "leaf-{{ rack_id }}a"
+      - "leaf-{{ rack_id }}b"
+
+- set_fact:
+    rack_links: >-
+      {{
+        (all_links | selectattr('source', 'match', '^spine-') | selectattr('target', 'in', leafs) | map(attribute='bridge') | list) +
+        (all_links | selectattr('target', 'match', '^spine-') | selectattr('source', 'in', leafs) | map(attribute='bridge') | list)
+      }}
+
+- name: Set rack partition state
+  command: "ip link set {{ item }} {{ 'up' if restore|default(false) else 'down' }}"
+  loop: "{{ rack_links }}"

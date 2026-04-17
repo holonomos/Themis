@@ -1,0 +1,39 @@
+name: frr-fedora
+display_name: "FRR on Fedora"
+base_os: fedora
+base_os_version: "43"
+nos: frr
+
+versions:
+  fedora_release: "43"
+  frr: "9.1"
+  node_exporter: "1.7.0"
+  frr_exporter: "1.10.1"
+  prometheus: "2.47.0"
+  grafana: "10.0.3"
+  loki: "2.9.3"
+  promtail: "2.9.3"
+
+resource_profiles:
+  border:  { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  spine:   { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  leaf:    { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  server:  { vcpu: 1, memory_mb: 768,  disk_gb: 5  }
+  mgmt:    { vcpu: 1, memory_mb: 512,  disk_gb: 5  }
+  obs:     { vcpu: 2, memory_mb: 2048, disk_gb: 10 }
+  ops:     { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  artifacts: { vcpu: 1, memory_mb: 512, disk_gb: 20 }
+  bastion: { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+
+ksm:
+  base_mb: 200
+  incremental_mb: 60
+
+nos_driver:
+  config_path: /etc/frr/frr.conf
+  reload_command: "systemctl reload frr"
+  verify_command: "vtysh -c 'show bgp summary'"
+  main_template: frr.conf.j2
+  additional_files:
+    - { template: daemons.j2,   path: /etc/frr/daemons   }
+    - { template: vtysh.conf.j2, path: /etc/frr/vtysh.conf }

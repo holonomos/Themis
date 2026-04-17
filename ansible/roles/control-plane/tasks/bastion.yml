@@ -1,0 +1,4 @@
+---
+- name: Setup iptables NAT on bastion
+  command: iptables -t nat -A POSTROUTING -o {{ wan_interface|default('eth0') }} -j MASQUERADE
+  ignore_errors: yes

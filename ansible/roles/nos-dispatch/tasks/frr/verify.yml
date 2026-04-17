@@ -1,0 +1,10 @@
+---
+- name: Verify BGP
+  command: vtysh -c 'show bgp summary'
+  register: bgp_out
+  changed_when: false
+  ignore_errors: yes
+
+- name: Assert success
+  assert:
+    that: bgp_out.rc == 0

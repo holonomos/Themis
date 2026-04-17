@@ -1,0 +1,105 @@
+!
+! ClosWatch — FRR configuration for {{ hostname }}
+! Generated from topology.yml — DO NOT HAND-EDIT
+!
+frr defaults datacenter
+hostname {{ hostname }}
+log syslog informational
+service integrated-vtysh-config
+!
+! --- Loopback ---
+interface lo
+ ip address {{ loopback }}
+!
+! --- Fabric interfaces ---
+{% for iface in interfaces %}
+interface {{ iface.name }}
+ ip address {{ iface.ip }}/{{ iface.prefix_len }}
+ no shutdown
+!
+{% endfor %}
+{% if bastion_gateways %}
+! --- Static default route (north-south exit via bastion) ---
+{% for gw in bastion_gateways %}
+ip route 0.0.0.0/0 {{ gw }}
+{% endfor %}
+!
+{% endif %}
+{% if server_static_routes %}
+! --- Static routes to server loopbacks ---
+{% for route in server_static_routes %}
+ip route {{ route.prefix }} {{ route.nexthop }}
+{% endfor %}
+!
+{% endif %}
+! --- Prefix list: deny management subnet from redistribution ---
+ip prefix-list CONNECTED-FILTER seq 5 deny 192.168.0.0/24 le 32
+ip prefix-list CONNECTED-FILTER seq 100 permit 0.0.0.0/0 le 32
+!
+! --- Route map for redistribute filtering ---
+route-map CONNECTED-FILTER permit 10
+ match ip address prefix-list CONNECTED-FILTER
+exit
+!
+! --- BGP ---
+router bgp {{ asn }}
+ bgp router-id {{ router_id }}
+ no bgp ebgp-requires-policy
+ no bgp default ipv4-unicast
+ bgp bestpath as-path multipath-relax
+ timers bgp {{ bgp_keepalive }} {{ bgp_holdtime }}
+ !
+ ! --- Neighbors ---
+{% for nbr in bgp_neighbors %}
+ neighbor {{ nbr.ip }} remote-as {{ nbr.remote_asn }}
+ neighbor {{ nbr.ip }} description {{ nbr.name }}
+ neighbor {{ nbr.ip }} bfd
+{% endfor %}
+ !
+ ! --- IPv4 Unicast ---
+ address-family ipv4 unicast
+  redistribute connected route-map CONNECTED-FILTER
+{% if bastion_gateways or server_static_routes %}
+  redistribute static
+{% endif %}
+  maximum-paths 8
+{% for nbr in bgp_neighbors %}
+  neighbor {{ nbr.ip }} activate
+{% if needs_allowas_in %}
+  neighbor {{ nbr.ip }} allowas-in 1
+{% endif %}
+{% if bastion_gateways %}
+  neighbor {{ nbr.ip }} default-originate
+{% endif %}
+{% endfor %}
+ exit-address-family
+ !
+{% if evpn_vtep or is_spine %}
+ ! --- L2VPN EVPN ---
+ address-family l2vpn evpn
+{% for nbr in bgp_neighbors %}
+  neighbor {{ nbr.ip }} activate
+{% if is_spine %}
+  neighbor {{ nbr.ip }} next-hop-unchanged
+{% endif %}
+{% endfor %}
+{% if evpn_vtep %}
+  advertise-all-vni
+{% endif %}
+ exit-address-family
+{% endif %}
+exit
+!
+! --- BFD ---
+bfd
+{% for nbr in bgp_neighbors %}
+ peer {{ nbr.ip }}
+  transmit-interval {{ bfd_tx }}
+  receive-interval {{ bfd_rx }}
+  detect-multiplier {{ bfd_mult }}
+ exit
+ !
+{% endfor %}
+exit
+!
+end

@@ -1,0 +1,1 @@
+Themis is a greenfield network fabric emulator that dynamically builds modular, layered network simulations. By combining a topology-driven Python generator with Ansible-orchestrated KVM provisioning, it completely decouples the topology design from the virtualization backend and allows simulating diverse fabric architectures.

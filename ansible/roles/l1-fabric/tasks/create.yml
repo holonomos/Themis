@@ -1,0 +1,20 @@
+---
+- name: Create management bridge
+  command: ip link add name {{ mgmt_bridge }} type bridge
+  ignore_errors: yes
+
+- name: Set management bridge UP
+  command: ip link set {{ mgmt_bridge }} up
+
+- name: Assign management IP to bridge
+  command: ip addr add {{ mgmt_gateway }}/{{ mgmt_cidr | split('/') | last }} dev {{ mgmt_bridge }}
+  ignore_errors: yes
+
+- name: Create fabric bridges
+  command: ip link add name {{ item.bridge }} type bridge
+  loop: "{{ all_links }}"
+  ignore_errors: yes
+
+- name: Set fabric bridges UP
+  command: ip link set {{ item.bridge }} up
+  loop: "{{ all_links }}"

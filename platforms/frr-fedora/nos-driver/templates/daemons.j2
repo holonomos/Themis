@@ -1,0 +1,37 @@
+# ClosWatch — FRR daemon selection for {{ hostname }}
+# Generated from topology.yml — DO NOT HAND-EDIT
+#
+# Enabled daemons:
+#   zebra   — kernel routing table management
+#   bgpd    — BGP routing (eBGP, EVPN)
+#   bfdd    — BFD failure detection
+#   staticd — static route support
+#
+bgpd=yes
+ospfd=no
+ospf6d=no
+ripd=no
+ripngd=no
+isisd=no
+pimd=no
+pim6d=no
+ldpd=no
+nhrpd=no
+eigrpd=no
+babeld=no
+sharpd=no
+pbrd=no
+bfdd=yes
+fabricd=no
+vrrpd=no
+pathd=no
+zebra=yes
+staticd=yes
+
+vtysh_enable=yes
+
+# VTY binds to all interfaces (accessible from mgmt network for frr_exporter)
+zebra_options="  -A 0.0.0.0 -s 90000000"
+bgpd_options="   -A 0.0.0.0"
+bfdd_options="   -A 0.0.0.0"
+staticd_options="-A 0.0.0.0"

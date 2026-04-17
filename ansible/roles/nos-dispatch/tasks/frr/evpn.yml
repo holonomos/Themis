@@ -1,0 +1,29 @@
+---
+- name: Determine if node is a VTEP (leaf)
+  set_fact:
+    is_vtep: "{{ role == 'leaf' }}"
+
+- name: Setup VXLAN interface
+  command: "ip link add vxlan{{ evpn_vni | default(10000) }} type vxlan id {{ evpn_vni | default(10000) }} dstport 4789 local {{ loopback | default('127.0.0.1') | regex_replace('/.*$', '') }}"
+  when: is_vtep
+  ignore_errors: yes
+
+- name: Set VXLAN link UP
+  command: "ip link set vxlan{{ evpn_vni | default(10000) }} up"
+  when: is_vtep
+  ignore_errors: yes
+
+- name: Create VXLAN bridge
+  command: "ip link add br-vni{{ evpn_vni | default(10000) }} type bridge"
+  when: is_vtep
+  ignore_errors: yes
+
+- name: Add VXLAN to bridge
+  command: "ip link set vxlan{{ evpn_vni | default(10000) }} master br-vni{{ evpn_vni | default(10000) }}"
+  when: is_vtep
+  ignore_errors: yes
+
+- name: Set VXLAN bridge UP
+  command: "ip link set br-vni{{ evpn_vni | default(10000) }} up"
+  when: is_vtep
+  ignore_errors: yes

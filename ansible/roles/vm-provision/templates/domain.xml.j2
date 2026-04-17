@@ -1,0 +1,43 @@
+<domain type='kvm'>
+  <name>{{ vm_name }}</name>
+  <memory unit='MiB'>{{ vm.memory_mb }}</memory>
+  <vcpu placement='static'>{{ vm.vcpu }}</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <cpu mode='host-passthrough'/>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/{{ vm_name }}.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <interface type='bridge'>
+      <mac address='{{ vm.mgmt_mac }}'/>
+      <source bridge='{{ mgmt_bridge }}'/>
+      <model type='virtio'/>
+    </interface>
+{% if vm.interfaces is defined %}
+{% for iface in vm.interfaces %}
+    <interface type='bridge'>
+      <mac address='{{ iface.mac }}'/>
+      <source bridge='{{ iface.bridge }}'/>
+      <model type='virtio'/>
+    </interface>
+{% endfor %}
+{% endif %}
+    <serial type='pty'>
+      <target port='0'/>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+    <graphics type='vnc' port='-1' autoport='yes'/>
+  </devices>
+</domain>

@@ -1,0 +1,7 @@
+template: clos-3tier          # must match a directory name under templates/
+parameters:                   # validated against template.yml parameter schema
+  spine_count: 2
+  rack_count: 4
+  servers_per_rack: 4
+platform: frr-fedora          # must match a directory name under platforms/
+wan_interface: eth0            # host network interface bastion NAT masquerades through

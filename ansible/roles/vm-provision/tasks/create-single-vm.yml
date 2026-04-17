@@ -1,0 +1,19 @@
+---
+- set_fact:
+    vm: "{{ hostvars[vm_name] }}"
+
+- name: Create CoW volume
+  command: qemu-img create -f qcow2 -F qcow2 -b /var/lib/libvirt/images/{{ project_name }}-base.qcow2 /var/lib/libvirt/images/{{ vm_name }}.qcow2 {{ vm.disk_gb|default(3) }}G
+  args:
+    creates: /var/lib/libvirt/images/{{ vm_name }}.qcow2
+
+- name: Define domain
+  community.libvirt.virt:
+    command: define
+    xml: "{{ lookup('template', 'domain.xml.j2') }}"
+
+- name: Start domain
+  community.libvirt.virt:
+    command: start
+    name: "{{ vm_name }}"
+    state: running

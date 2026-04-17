@@ -1,0 +1,23 @@
+---
+- name: Ensure directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/frr
+    - /etc/udev/rules.d
+
+- name: Copy config files
+  copy:
+    src: "{{ playbook_dir }}/../generated/configs/{{ inventory_hostname }}/{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { src: "frr.conf", dest: "/etc/frr/frr.conf" }
+    - { src: "daemons", dest: "/etc/frr/daemons" }
+    - { src: "vtysh.conf", dest: "/etc/frr/vtysh.conf" }
+    - { src: "70-fabric.rules", dest: "/etc/udev/rules.d/70-fabric.rules" }
+  ignore_errors: yes
+
+- name: Reload FRR
+  command: systemctl reload frr
+  ignore_errors: yes

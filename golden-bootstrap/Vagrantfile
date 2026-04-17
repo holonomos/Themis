@@ -1,0 +1,29 @@
+# frozen_string_literal: true
+# ClosWatch — single VM for interactive golden-image creation (see make bake-strap).
+# User drops a base .box under depot/boxes/base.box (or CLOSWATCH_BASE_BOX), runs
+# bake-strap, SSHs in, installs what the lab needs, then make bake-golden packages it.
+
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  # Give the guest enough time to get a DHCP lease on the vagrant-libvirt
+  # management network.  The default 300 s is too short on slow hosts.
+  config.vm.boot_timeout = 600
+
+  box_name = ENV.fetch("CLOSWATCH_VAGRANT_BOX", "closwatch-golden-base")
+  mem = (ENV["CLOSWATCH_STRAP_MEM"] || "4096").to_i
+  cpus = (ENV["CLOSWATCH_STRAP_CPUS"] || "2").to_i
+
+  config.vm.define "golden-strap", primary: true do |vm|
+    vm.vm.box = box_name
+    vm.vm.hostname = "golden-strap"
+
+    vm.vm.provider :libvirt do |libvirt|
+      libvirt.driver = "kvm"
+      libvirt.storage_pool_name = "default"
+      libvirt.memory = mem
+      libvirt.cpus = cpus
+      libvirt.mgmt_attach = true
+    end
+  end
+end

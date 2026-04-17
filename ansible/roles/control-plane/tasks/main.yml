@@ -1,0 +1,11 @@
+---
+- include_tasks: mgmt.yml
+  when: role == 'mgmt'
+- include_tasks: bastion.yml
+  when: role == 'bastion'
+- include_tasks: obs.yml
+  when: role == 'obs'
+- include_tasks: ops.yml
+  when: role == 'ops'
+- include_tasks: artifacts.yml
+  when: role == 'artifacts'

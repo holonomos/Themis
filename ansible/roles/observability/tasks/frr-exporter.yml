@@ -1,0 +1,6 @@
+---
+- name: Enable and start frr-exporter
+  systemd:
+    name: frr_exporter
+    state: started
+    enabled: yes

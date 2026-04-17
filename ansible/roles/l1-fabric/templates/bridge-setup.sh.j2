@@ -1,0 +1,26 @@
+#!/bin/bash
+# ClosWatch — Bridge Setup
+# Generated from topology.yml — DO NOT HAND-EDIT
+# 54 P2P fabric bridges + 1 management bridge.
+# STP disabled on all fabric bridges (L3 routing, not L2 switching).
+# Uses sudo internally for ip link commands. Run as your user.
+
+set -euo pipefail
+
+echo "{{ virsh_prefix }}: Creating fabric bridges..."
+
+# --- Management bridge ---
+# Managed by libvirt ({{ mgmt_bridge }}) — do NOT create or delete it here.
+echo "  [mgmt] {{ mgmt_bridge }} (libvirt-managed, skipping creation)"
+
+# --- Fabric bridges (STP disabled, no IP) ---
+{% for link in links %}
+echo "  [{{ link.tier }}] {{ link.bridge }} ({{ link.a_name }} <-> {{ link.b_name }})"
+sudo ip link add {{ link.bridge }} type bridge 2>/dev/null || true
+sudo bash -c 'echo 0 > /sys/class/net/{{ link.bridge }}/bridge/stp_state'
+sudo ip link set {{ link.bridge }} up
+{% endfor %}
+
+echo ""
+echo "{{ virsh_prefix }}: {{ links|length }} fabric bridges created (STP disabled)."
+echo "  Mgmt bridge: {{ mgmt_bridge }} (libvirt-managed)."
