@@ -32,11 +32,11 @@ fixed:
   border_count: 2
   leafs_per_rack: 2
   control_plane_nodes:
-    - { name: mgmt,      role: mgmt,      mgmt_ip: "192.168.0.1" }
-    - { name: bastion,   role: bastion,   mgmt_ip: "192.168.0.2" }
-    - { name: ops,       role: ops,       mgmt_ip: "192.168.0.3" }
-    - { name: obs,       role: obs,       mgmt_ip: "192.168.0.4" }
-    - { name: artifacts, role: artifacts, mgmt_ip: "192.168.0.5" }
+    - { name: bastion,      role: bastion,      mgmt_ip: "192.168.0.2" }
+    - { name: services,     role: services,     mgmt_ip: "192.168.0.3" }
+    - { name: orchestrator, role: orchestrator, mgmt_ip: "192.168.0.4" }
+    - { name: telemetry,    role: telemetry,    mgmt_ip: "192.168.0.5" }
+    - { name: registry,     role: registry,     mgmt_ip: "192.168.0.6" }
 
 addressing:
   loopback_cidr: "10.0.0.0/16"

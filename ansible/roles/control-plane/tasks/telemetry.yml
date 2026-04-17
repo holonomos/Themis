@@ -1,0 +1,4 @@
+---
+- name: "telemetry role is deferred"
+  debug:
+    msg: "control-plane/telemetry is a scaffold stub (Prometheus + Grafana + Loki deferred to follow-up)."

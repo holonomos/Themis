@@ -13,10 +13,10 @@ TIER_CODES = {
     "leaf":        0x03,
     "server":      0x04,
     "bastion":     0x05,
-    "mgmt":        0x06,
-    "obs":         0x07,
-    "ops":         0x08,
-    "artifacts":   0x09,
+    "services":    0x06,
+    "telemetry":   0x07,
+    "orchestrator":0x08,
+    "registry":    0x09,
     "super_spine": 0x0A,
 }
 

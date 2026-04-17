@@ -47,7 +47,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
     for name, node in topology["nodes"].items():
         role = node["role"]
         entry = {"ansible_host": node["mgmt_ip"]}
-        if role in ("mgmt", "bastion", "ops", "obs", "artifacts"):
+        if role in ("bastion", "services", "orchestrator", "telemetry", "registry"):
             entry["role"] = role
             cp_hosts[name] = entry
         elif role == "border":
@@ -115,7 +115,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         yaml.safe_dump(control_vars, f, sort_keys=False)
         
     for name, node in topology["nodes"].items():
-        if node["role"] in ("mgmt", "bastion", "ops", "obs", "artifacts"):
+        if node["role"] in ("bastion", "services", "orchestrator", "telemetry", "registry"):
             continue
 
         if node.get("type") == "frr-vm":
