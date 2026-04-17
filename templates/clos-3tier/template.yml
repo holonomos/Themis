@@ -2,6 +2,11 @@ name: clos-3tier
 display_name: "3-Tier Clos (Border + Spine + Leaf + Server)"
 
 parameters:
+  border_count:
+    type: integer
+    default: 2
+    min: 1
+    max: 4
   spine_count:
     type: integer
     default: 2
@@ -19,21 +24,23 @@ parameters:
     max: 8
 
 fixed:
-  border_count: 2
   leafs_per_rack: 2
   control_plane_nodes:
-    - { name: mgmt,      role: mgmt,      mgmt_ip: "192.168.0.1"  }
-    - { name: bastion,   role: bastion,   mgmt_ip: "192.168.0.2"  }
-    - { name: ops,       role: ops,       mgmt_ip: "192.168.0.3"  }
-    - { name: obs,       role: obs,       mgmt_ip: "192.168.0.4"  }
-    - { name: artifacts, role: artifacts, mgmt_ip: "192.168.0.5"  }
+    - { name: bastion,      role: bastion,      mgmt_ip: "192.168.0.2" }
+    - { name: services,     role: services,     mgmt_ip: "192.168.0.3" }
+    - { name: orchestrator, role: orchestrator, mgmt_ip: "192.168.0.4" }
+    - { name: telemetry,    role: telemetry,    mgmt_ip: "192.168.0.5" }
+    - { name: registry,     role: registry,     mgmt_ip: "192.168.0.6" }
 
 addressing:
   loopback_cidr: "10.0.0.0/16"
   fabric_p2p_cidr: "172.16.0.0/16"
   mgmt_cidr: "192.168.0.0/24"
   mgmt_gateway: "192.168.0.1"
-  mgmt_bridge: "virbr-<project-name>"
+  mgmt_bridge: "br-mgmt-<project-name>"
+  data_cidr: "10.100.0.0/30"
+  data_gateway: "10.100.0.1"
+  data_bridge: "br-data-<project-name>"
 
 asn:
   border: 65000

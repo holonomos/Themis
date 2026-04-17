@@ -1,0 +1,4 @@
+---
+- name: "registry role is deferred"
+  debug:
+    msg: "control-plane/registry is a scaffold stub (package / image registry deferred to follow-up)."

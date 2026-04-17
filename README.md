@@ -2,9 +2,9 @@
 
 Themis is a topology-driven KVM network fabric emulator. A single Linux host runs a
 full routed data-center fabric — borders, spines, leafs, servers — plus a fixed
-control plane (mgmt, obs, ops, artifacts, bastion), all as VMs on libvirt/KVM. The
-aggressive use of KSM (Kernel Samepage Merging) across a shared base image makes
-large fabrics viable on a workstation.
+control plane (bastion, services, orchestrator, telemetry, registry), all as VMs on
+libvirt/KVM. The aggressive use of KSM (Kernel Samepage Merging) across a shared
+base image makes large fabrics viable on a workstation.
 
 A Python generator compiles a short `project.yml` (template + parameters + platform)
 into an Ansible inventory and per-node NOS configuration files. Static Ansible
@@ -24,7 +24,7 @@ Implemented:
 
 Stubbed / deferred:
 - Templates `clos-5stage`, `hub-spoke`
-- Control-plane roles `obs`, `ops`, `artifacts` (mgmt + bastion are implemented)
+- Control-plane roles `telemetry`, `orchestrator`, `registry` (bastion + services are implemented)
 - Test scaffold
 
 ## Quickstart

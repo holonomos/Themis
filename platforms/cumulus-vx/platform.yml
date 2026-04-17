@@ -19,11 +19,11 @@ resource_profiles:
   spine:   { vcpu: 1, memory_mb: 768,  disk_gb: 6  }
   leaf:    { vcpu: 1, memory_mb: 768,  disk_gb: 6  }
   server:  { vcpu: 1, memory_mb: 768,  disk_gb: 5  }
-  mgmt:    { vcpu: 1, memory_mb: 512,  disk_gb: 5  }
-  obs:     { vcpu: 2, memory_mb: 2048, disk_gb: 10 }
-  ops:     { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
-  artifacts: { vcpu: 1, memory_mb: 512, disk_gb: 20 }
-  bastion: { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  bastion:      { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  services:     { vcpu: 1, memory_mb: 512,  disk_gb: 5  }
+  orchestrator: { vcpu: 1, memory_mb: 256,  disk_gb: 3  }
+  telemetry:    { vcpu: 2, memory_mb: 2048, disk_gb: 10 }
+  registry:     { vcpu: 1, memory_mb: 512,  disk_gb: 20 }
 
 ksm:
   base_mb: 400

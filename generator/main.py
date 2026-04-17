@@ -6,6 +6,7 @@ from .expander import expand
 from .estimator import estimate, print_estimate
 from .inventory import write_inventory
 from .renderer import render_configs
+from .bootstrap import write_seeds
 
 def run(project_path: str, output_dir: str = "generated") -> None:
     """
@@ -41,3 +42,7 @@ def run(project_path: str, output_dir: str = "generated") -> None:
     print("Rendering NOS configs ...")
     render_configs(topology, platform, platforms_dir, output_dir)
     print(f"  -> {os.path.join(output_dir, 'configs')}")
+
+    print("Writing cloud-init seeds ...")
+    seeded = write_seeds(topology, output_dir)
+    print(f"  -> {os.path.join(output_dir, 'seeds')} ({len(seeded)} nodes)")

@@ -9,6 +9,18 @@
   loop: "{{ all_links }}"
   ignore_errors: yes
 
+- name: Remove MASQUERADE rule for data subnet
+  command: iptables -t nat -D POSTROUTING -s {{ data_cidr }} -o {{ wan_interface }} -j MASQUERADE
+  ignore_errors: yes
+
+- name: Set data bridge down
+  command: ip link set {{ data_bridge }} down
+  ignore_errors: yes
+
+- name: Delete data bridge
+  command: ip link delete {{ data_bridge }}
+  ignore_errors: yes
+
 - name: Set management bridge down
   command: ip link set {{ mgmt_bridge }} down
   ignore_errors: yes

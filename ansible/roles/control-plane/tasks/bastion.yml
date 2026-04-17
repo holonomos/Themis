@@ -1,4 +1,11 @@
 ---
-- name: Setup iptables NAT on bastion
-  command: iptables -t nat -A POSTROUTING -o {{ wan_interface|default('eth0') }} -j MASQUERADE
-  ignore_errors: yes
+# Bastion forwards between the fabric-facing interfaces (eth-border-*) and
+# the data-plane interface (eth-data). The host MASQUERADEs the data subnet
+# out to the WAN, so no NAT is needed on bastion itself.
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: yes
+    reload: yes

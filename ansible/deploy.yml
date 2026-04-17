@@ -15,6 +15,13 @@
     - role: l1-fabric
       tasks_from: create
 
+- name: Build cloud-init seed ISOs
+  hosts: hypervisor
+  gather_facts: no
+  become: yes
+  roles:
+    - role: vm-bootstrap
+
 - name: Provision all VMs
   hosts: hypervisor
   gather_facts: no

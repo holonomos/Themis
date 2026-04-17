@@ -10,8 +10,8 @@
 - set_fact:
     rack_links: >-
       {{
-        (all_links | selectattr('source', 'match', '^spine-') | selectattr('target', 'in', leafs) | map(attribute='bridge') | list) +
-        (all_links | selectattr('target', 'match', '^spine-') | selectattr('source', 'in', leafs) | map(attribute='bridge') | list)
+        (all_links | selectattr('a', 'match', '^spine-') | selectattr('b', 'in', leafs) | map(attribute='bridge') | list) +
+        (all_links | selectattr('b', 'match', '^spine-') | selectattr('a', 'in', leafs) | map(attribute='bridge') | list)
       }}
 
 - name: Set rack partition state

@@ -1,7 +1,7 @@
 ---
 - name: Determine bridge name
   set_fact:
-    bridge: "{{ (all_links | selectattr('source', 'in', [node_a, node_b]) | selectattr('target', 'in', [node_a, node_b]) | first).bridge }}"
+    bridge: "{{ (all_links | selectattr('a', 'in', [node_a, node_b]) | selectattr('b', 'in', [node_a, node_b]) | first).bridge }}"
 
 - name: Get veths attached to bridge
   shell: "ip link show master {{ bridge }} | grep -oP '^[0-9]+: \\K[^:@]+'"

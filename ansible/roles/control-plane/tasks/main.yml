@@ -1,11 +1,11 @@
 ---
-- include_tasks: mgmt.yml
-  when: role == 'mgmt'
 - include_tasks: bastion.yml
   when: role == 'bastion'
-- include_tasks: obs.yml
-  when: role == 'obs'
-- include_tasks: ops.yml
-  when: role == 'ops'
-- include_tasks: artifacts.yml
-  when: role == 'artifacts'
+- include_tasks: services.yml
+  when: role == 'services'
+- include_tasks: orchestrator.yml
+  when: role == 'orchestrator'
+- include_tasks: telemetry.yml
+  when: role == 'telemetry'
+- include_tasks: registry.yml
+  when: role == 'registry'

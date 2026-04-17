@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import yaml
 
@@ -47,7 +48,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
     for name, node in topology["nodes"].items():
         role = node["role"]
         entry = {"ansible_host": node["mgmt_ip"]}
-        if role in ("mgmt", "bastion", "ops", "obs", "artifacts"):
+        if role in ("bastion", "services", "orchestrator", "telemetry", "registry"):
             entry["role"] = role
             cp_hosts[name] = entry
         elif role == "border":
@@ -64,6 +65,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         
     project_name = project.get("project_name", "themis")
     mgmt_bridge = topology["management"]["bridge"].replace("<project-name>", project_name)
+    data_bridge = topology["management"]["data_bridge"].replace("<project-name>", project_name)
     all_links = []
     
     for link in topology["links"]:
@@ -81,13 +83,33 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         for node in topology["nodes"].values()
     ]
 
+    dhcp_reservations = [
+        {"name": node["name"], "ip": node["mgmt_ip"], "mac": node["mgmt_mac"]}
+        for node in topology["nodes"].values()
+        if node.get("bootstrap", {}).get("mode") == "dhcp"
+    ]
+
+    mgmt_network = ipaddress.ip_network(topology["management"]["cidr"], strict=False)
+    pool_hosts = list(mgmt_network.hosts())
+    dhcp_pool_start = str(pool_hosts[99]) if len(pool_hosts) > 99 else str(pool_hosts[len(pool_hosts) // 2])
+    dhcp_pool_end = str(pool_hosts[-2]) if len(pool_hosts) >= 2 else str(pool_hosts[-1])
+
+    services_ip = next(
+        (n["mgmt_ip"] for n in topology["nodes"].values() if n["role"] == "services"),
+        topology["management"]["gateway"],
+    )
+
     all_vars = {
         "platform": platform["name"],
         "project_name": project_name,
         "mgmt_bridge": mgmt_bridge,
         "mgmt_cidr": topology["management"]["cidr"],
         "mgmt_gateway": topology["management"]["gateway"],
+        "data_bridge": data_bridge,
+        "data_cidr": topology["management"]["data_cidr"],
+        "data_gateway": topology["management"]["data_gateway"],
         "domain": topology["management"]["dns_domain"],
+        "generator_output_dir": os.path.abspath(out_dir),
         "wan_interface": project.get("wan_interface", "eth0"),
         "base_image_path": project.get("base_image_path") or os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -95,6 +117,10 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         ),
         "all_links": all_links,
         "reservations": reservations,
+        "dhcp_reservations": dhcp_reservations,
+        "dhcp_pool_start": dhcp_pool_start,
+        "dhcp_pool_end": dhcp_pool_end,
+        "services_ip": services_ip,
     }
     with open(os.path.join(group_vars_dir, "all.yml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(all_vars, f, sort_keys=False)
@@ -111,25 +137,30 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         yaml.safe_dump(control_vars, f, sort_keys=False)
         
     for name, node in topology["nodes"].items():
-        if node["role"] in ("mgmt", "bastion", "ops", "obs", "artifacts"):
-            continue
-
         if node.get("type") == "frr-vm":
             nos_type = node.get("nos_type") or platform["nos"]
         else:
             nos_type = None
+
+        profile = platform.get("resource_profiles", {}).get(node["role"], {})
+
+        interfaces = [
+            {**iface, "bridge": iface["bridge"].replace("<project-name>", project_name)}
+            for iface in node.get("interfaces", [])
+        ]
 
         hvars = {
             "role": node["role"],
             "nos_type": nos_type,
             "asn": node.get("asn"),
             "loopback": node.get("loopback"),
-            "vcpu": node.get("vcpu", 1),
-            "memory_mb": node.get("memory_mb", 256),
-            "disk_gb": node.get("disk_gb", 3),
+            "vcpu": profile.get("vcpu", node.get("vcpu", 1)),
+            "memory_mb": profile.get("memory_mb", node.get("memory_mb", 256)),
+            "disk_gb": profile.get("disk_gb", node.get("disk_gb", 3)),
             "mgmt_mac": node["mgmt_mac"],
-            "interfaces": node.get("interfaces", []),
-            "bgp_neighbors": node.get("bgp_neighbors", [])
+            "interfaces": interfaces,
+            "bgp_neighbors": node.get("bgp_neighbors", []),
+            "bootstrap": node.get("bootstrap", {"mode": "dhcp"}),
         }
         if not hvars["nos_type"]:
             hvars.pop("nos_type")

@@ -6,9 +6,38 @@
 - name: Set management bridge UP
   command: ip link set {{ mgmt_bridge }} up
 
-- name: Assign management IP to bridge
+- name: Assign host gateway IP to management bridge
   command: ip addr add {{ mgmt_gateway }}/{{ mgmt_cidr | split('/') | last }} dev {{ mgmt_bridge }}
   ignore_errors: yes
+
+- name: Create data bridge
+  command: ip link add name {{ data_bridge }} type bridge
+  ignore_errors: yes
+
+- name: Set data bridge UP
+  command: ip link set {{ data_bridge }} up
+
+- name: Assign host gateway IP to data bridge
+  command: ip addr add {{ data_gateway }}/{{ data_cidr | split('/') | last }} dev {{ data_bridge }}
+  ignore_errors: yes
+
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: yes
+    reload: yes
+
+- name: MASQUERADE data subnet out WAN interface
+  command: iptables -t nat -C POSTROUTING -s {{ data_cidr }} -o {{ wan_interface }} -j MASQUERADE
+  register: masq_check
+  failed_when: false
+  changed_when: false
+
+- name: Install MASQUERADE rule for data subnet
+  command: iptables -t nat -A POSTROUTING -s {{ data_cidr }} -o {{ wan_interface }} -j MASQUERADE
+  when: masq_check.rc != 0
 
 - name: Create fabric bridges
   command: ip link add name {{ item.bridge }} type bridge

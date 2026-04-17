@@ -13,10 +13,10 @@ TIER_CODES = {
     "leaf":        0x03,
     "server":      0x04,
     "bastion":     0x05,
-    "mgmt":        0x06,
-    "obs":         0x07,
-    "ops":         0x08,
-    "artifacts":   0x09,
+    "services":    0x06,
+    "telemetry":   0x07,
+    "orchestrator":0x08,
+    "registry":    0x09,
     "super_spine": 0x0A,
 }
 
@@ -42,13 +42,13 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
     nodes = {}
     links = []
     
+    border_count = parameters["border_count"]
     super_spine_count = parameters["super_spine_count"]
     pod_count = parameters["pod_count"]
     spines_per_pod = parameters["spines_per_pod"]
     racks_per_pod = parameters["racks_per_pod"]
     servers_per_rack = parameters["servers_per_rack"]
-    
-    border_count = meta["fixed"]["border_count"]
+
     leafs_per_rack = meta["fixed"]["leafs_per_rack"]
     control_nodes = meta["fixed"]["control_plane_nodes"]
     
@@ -65,7 +65,9 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
         role_counters[role] = role_counters.get(role, 0) + 1
         idx = role_counters[role]
         mac = generate_mac(role, idx)
-        
+        control_plane_roles = {"bastion", "services", "orchestrator", "telemetry", "registry"}
+        bootstrap_mode = "seed" if role in control_plane_roles else "dhcp"
+
         nodes[name] = {
             "name": name,
             "role": role,
@@ -80,6 +82,7 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
             "mgmt_mac": mac,
             "interfaces": [],
             "bgp_neighbors": [],
+            "bootstrap": {"mode": bootstrap_mode},
             "_role_index": idx,
             "_rack": rack,
             "_pod": pod
@@ -89,6 +92,20 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
     # 1. Control plane nodes
     for cn in control_nodes:
         add_node(cn["name"], cn["role"], False, cn["mgmt_ip"])
+
+    # Attach bastion to the data bridge (north-south egress via host MASQUERADE).
+    data_net = ip_to_int(addr["data_cidr"].split("/")[0])
+    data_prefix = addr["data_cidr"].split("/")[1]
+    nodes["bastion"]["interfaces"].append({
+        "name": "eth-data",
+        "ip": f"{int_to_ip(data_net + 2)}/{data_prefix}",
+        "peer_ip": addr["data_gateway"],
+        "subnet": addr["data_cidr"],
+        "peer": "host",
+        "bridge": addr["data_bridge"],
+        "mac": generate_fabric_mac("bastion", 1, 0xFE),
+        "role": "data"
+    })
 
     def get_mgmt_ip(offset: int) -> str:
         if offset > 254:
@@ -260,6 +277,9 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
         "cidr": addr["mgmt_cidr"],
         "gateway": addr["mgmt_gateway"],
         "bridge": addr["mgmt_bridge"],
+        "data_cidr": addr["data_cidr"],
+        "data_gateway": addr["data_gateway"],
+        "data_bridge": addr["data_bridge"],
         "dns_domain": "themis.local"
     }
 
