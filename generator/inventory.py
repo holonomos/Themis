@@ -100,7 +100,8 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         yaml.safe_dump(all_vars, f, sort_keys=False)
         
     fabric_vars = {
-        "nos_type": platform["nos"]
+        "nos_type": platform["nos"],
+        "verify_command": platform["nos_driver"]["verify_command"],
     }
     with open(os.path.join(group_vars_dir, "fabric_nodes.yml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(fabric_vars, f, sort_keys=False)

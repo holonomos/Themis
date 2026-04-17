@@ -3,3 +3,5 @@
   when: nos_type is defined and nos_type | length > 0
 - include_tasks: "{{ nos_type }}/evpn.yml"
   when: nos_type is defined and nos_type | length > 0 and role == 'leaf'
+- include_tasks: "{{ nos_type }}/verify.yml"
+  when: nos_type is defined and nos_type | length > 0
