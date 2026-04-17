@@ -7,7 +7,11 @@ FRR_EXPORTER_VER="1.10.1"
 PROMTAIL_VER="2.9.3"
 
 echo "==> [1/8] Installing packages"
-dnf install -y frr chrony rsyslog dnsmasq iptables-services bridge-utils iproute bind-utils tcpdump nftables tar curl ca-certificates unzip
+# cloud-init + cloud-utils: consumes the seed ISO attached to seed-mode VMs
+# at first boot (hostname + network-config). cloud-utils provides
+# cloud-localds which the ansible vm-bootstrap role uses on the host to
+# build seed ISOs — it's harmless but handy to ship in the guest image too.
+dnf install -y frr chrony rsyslog dnsmasq iptables-services bridge-utils iproute bind-utils tcpdump nftables tar curl ca-certificates unzip cloud-init cloud-utils
 
 echo "==> [2/8] Installing Prom exporters and Promtail"
 curl -sL "https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VER}/node_exporter-${NODE_EXPORTER_VER}.linux-amd64.tar.gz" | tar -xz -C /tmp/
@@ -83,6 +87,10 @@ setenforce 0 || true
 
 echo "==> [6/8] Enable at boot"
 systemctl enable chronyd rsyslog sshd frr
+# cloud-init stays enabled so the seed ISO is honored at first boot;
+# dhcp-mode VMs get their lease via NetworkManager's cloud-init fallthrough
+# (cloud-init finds no seed, drops into NoCloud-network which DHCPs normally).
+systemctl enable cloud-init cloud-config cloud-final cloud-init-local
 
 echo "==> [7/8] Clean for cloning"
 > /etc/machine-id
