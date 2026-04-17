@@ -33,7 +33,10 @@ addressing:
   fabric_p2p_cidr: "172.16.0.0/16"
   mgmt_cidr: "192.168.0.0/24"
   mgmt_gateway: "192.168.0.1"
-  mgmt_bridge: "virbr-<project-name>"
+  mgmt_bridge: "br-mgmt-<project-name>"
+  data_cidr: "10.100.0.0/30"
+  data_gateway: "10.100.0.1"
+  data_bridge: "br-data-<project-name>"
 
 asn:
   border: 65000

@@ -214,6 +214,9 @@ def expand(template_name: str, parameters: dict, templates_dir: str) -> dict:
         "cidr": addr["mgmt_cidr"],
         "gateway": addr["mgmt_gateway"],
         "bridge": addr["mgmt_bridge"],
+        "data_cidr": addr["data_cidr"],
+        "data_gateway": addr["data_gateway"],
+        "data_bridge": addr["data_bridge"],
         "dns_domain": "themis.local"
     }
 

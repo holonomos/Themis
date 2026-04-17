@@ -64,6 +64,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         
     project_name = project.get("project_name", "themis")
     mgmt_bridge = topology["management"]["bridge"].replace("<project-name>", project_name)
+    data_bridge = topology["management"]["data_bridge"].replace("<project-name>", project_name)
     all_links = []
     
     for link in topology["links"]:
@@ -87,6 +88,9 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         "mgmt_bridge": mgmt_bridge,
         "mgmt_cidr": topology["management"]["cidr"],
         "mgmt_gateway": topology["management"]["gateway"],
+        "data_bridge": data_bridge,
+        "data_cidr": topology["management"]["data_cidr"],
+        "data_gateway": topology["management"]["data_gateway"],
         "domain": topology["management"]["dns_domain"],
         "wan_interface": project.get("wan_interface", "eth0"),
         "base_image_path": project.get("base_image_path") or os.path.join(
