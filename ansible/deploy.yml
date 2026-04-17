@@ -45,9 +45,3 @@
     - nos-dispatch
     - observability
 
-- name: Verify fabric health
-  hosts: fabric_nodes
-  become: yes
-  roles:
-    - role: nos-dispatch
-      tasks_from: frr/verify
