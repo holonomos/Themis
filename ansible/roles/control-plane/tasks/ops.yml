@@ -1,2 +1,4 @@
 ---
-- name: Empty ops task
+- name: "ops role is deferred"
+  debug:
+    msg: "control-plane/ops is a scaffold stub (ansible-runner / orchestration host deferred to follow-up)."

@@ -1,6 +1,8 @@
 """
 Expander for clos-3tier topology.
-Ports the hardcoded logic from ClosWatch generate.py and makes it parameterized.
+
+Produces a topology dict (nodes, links, management, addressing) from the user-supplied
+template parameters and the template's fixed addressing/ASN scheme in template.yml.
 """
 
 from typing import Dict, Any

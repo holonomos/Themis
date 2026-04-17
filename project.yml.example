@@ -1,3 +1,4 @@
+project_name: themis-dev      # used for bridge/image naming; must be unique per lab on a host
 template: clos-3tier          # must match a directory name under templates/
 parameters:                   # validated against template.yml parameter schema
   spine_count: 2

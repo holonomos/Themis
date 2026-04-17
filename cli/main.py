@@ -17,7 +17,9 @@ def init():
     
     templates = [d for d in os.listdir(templates_dir) if os.path.isdir(os.path.join(templates_dir, d))]
     platforms = [d for d in os.listdir(platforms_dir) if os.path.isdir(os.path.join(platforms_dir, d))]
-    
+
+    project_name = click.prompt("Project name (used for bridge and image naming)")
+
     click.echo(f"Available templates: {', '.join(templates)}")
     template = click.prompt("Choose template", type=click.Choice(templates))
     
@@ -36,6 +38,7 @@ def init():
     wan_interface = click.prompt("WAN interface", default="eth0")
     
     project = {
+        "project_name": project_name,
         "template": template,
         "parameters": parameters,
         "platform": platform,

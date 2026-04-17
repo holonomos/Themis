@@ -1,2 +1,4 @@
 ---
-- name: Empty artifacts task
+- name: "artifacts role is deferred"
+  debug:
+    msg: "control-plane/artifacts is a scaffold stub (package / image registry deferred to follow-up)."

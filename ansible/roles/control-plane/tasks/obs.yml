@@ -1,2 +1,4 @@
 ---
-- name: Empty obs task
+- name: "obs role is deferred"
+  debug:
+    msg: "control-plane/obs is a scaffold stub (Prometheus + Grafana + Loki deferred to follow-up)."

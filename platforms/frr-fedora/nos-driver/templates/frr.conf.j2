@@ -1,5 +1,5 @@
 !
-! ClosWatch — FRR configuration for {{ hostname }}
+! Themis — FRR configuration for {{ hostname }}
 ! Generated from topology.yml — DO NOT HAND-EDIT
 !
 frr defaults datacenter
@@ -14,7 +14,7 @@ interface lo
 ! --- Fabric interfaces ---
 {% for iface in interfaces %}
 interface {{ iface.name }}
- ip address {{ iface.ip }}/{{ iface.prefix_len }}
+ ip address {{ iface.ip }}
  no shutdown
 !
 {% endfor %}
