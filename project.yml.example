@@ -1,4 +1,6 @@
 project_name: themis-dev      # used for bridge/image naming; must be unique per lab on a host
+# Optional: override baked image location. Defaults to golden-bootstrap/golden-image.box.
+# base_image_path: /abs/path/to/image.box
 template: clos-3tier          # must match a directory name under templates/
 parameters:                   # validated against template.yml parameter schema
   spine_count: 2

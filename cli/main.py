@@ -80,20 +80,26 @@ def generate():
     from generator.main import run as gen_run
     gen_run(os.path.abspath("project.yml"), "generated")
 
-def _run_playbook(playbook_path: str):
+def _run_playbook(playbook_path: str, extra_vars=None):
     inventory_path = "generated/inventory/hosts.yml"
     if not os.path.exists(inventory_path):
         click.echo(f"Inventory {inventory_path} not found. Run 'themis generate' first.", err=True)
         return
     
     cmd = ["ansible-playbook", playbook_path, "-i", inventory_path]
+    if extra_vars:
+        for k, v in extra_vars.items():
+            cmd.extend(["-e", f"{k}={v}"])
     subprocess.run(cmd, check=True)
 
 @cli.command()
-def deploy():
+@click.option("--base-image", "base_image", type=click.Path(exists=True, dir_okay=False), default=None,
+              help="Override base image path (overrides project.yml default).")
+def deploy(base_image):
     """Deploy the fabric"""
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    _run_playbook(os.path.join(base_dir, "ansible", "deploy.yml"))
+    extra = {"base_image_path": os.path.abspath(base_image)} if base_image else None
+    _run_playbook(os.path.join(base_dir, "ansible", "deploy.yml"), extra_vars=extra)
 
 @cli.command()
 def teardown():

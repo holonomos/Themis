@@ -89,7 +89,10 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         "mgmt_gateway": topology["management"]["gateway"],
         "domain": topology["management"]["dns_domain"],
         "wan_interface": project.get("wan_interface", "eth0"),
-        "base_image_path": "",
+        "base_image_path": project.get("base_image_path") or os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "golden-bootstrap", "golden-image.box"
+        ),
         "all_links": all_links,
         "reservations": reservations,
     }
