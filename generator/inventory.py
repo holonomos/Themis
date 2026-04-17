@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import yaml
 
@@ -88,6 +89,16 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         if node.get("bootstrap", {}).get("mode") == "dhcp"
     ]
 
+    mgmt_network = ipaddress.ip_network(topology["management"]["cidr"], strict=False)
+    pool_hosts = list(mgmt_network.hosts())
+    dhcp_pool_start = str(pool_hosts[99]) if len(pool_hosts) > 99 else str(pool_hosts[len(pool_hosts) // 2])
+    dhcp_pool_end = str(pool_hosts[-2]) if len(pool_hosts) >= 2 else str(pool_hosts[-1])
+
+    services_ip = next(
+        (n["mgmt_ip"] for n in topology["nodes"].values() if n["role"] == "services"),
+        topology["management"]["gateway"],
+    )
+
     all_vars = {
         "platform": platform["name"],
         "project_name": project_name,
@@ -107,6 +118,9 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         "all_links": all_links,
         "reservations": reservations,
         "dhcp_reservations": dhcp_reservations,
+        "dhcp_pool_start": dhcp_pool_start,
+        "dhcp_pool_end": dhcp_pool_end,
+        "services_ip": services_ip,
     }
     with open(os.path.join(group_vars_dir, "all.yml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(all_vars, f, sort_keys=False)

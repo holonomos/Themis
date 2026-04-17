@@ -1,26 +1,37 @@
 ---
-- name: Install dnsmasq via dnf
+- name: Install dnsmasq
   dnf:
     name: dnsmasq
     state: present
 
-- name: Configure dnsmasq
+- name: Disable systemd-resolved (binds :53 and conflicts with dnsmasq)
+  systemd:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
+  failed_when: false
+
+- name: Render dnsmasq configuration
   template:
     src: dnsmasq.conf.j2
     dest: /etc/dnsmasq.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart dnsmasq
 
-- name: Enable systemd-resolved override
-  file:
-    path: /etc/resolv.conf
-    state: absent
-- copy:
+- name: Point /etc/resolv.conf at dnsmasq locally
+  copy:
     dest: /etc/resolv.conf
     content: |
       nameserver 127.0.0.1
-      search themis.local
+      search {{ domain }}
+    owner: root
+    group: root
+    mode: '0644'
 
-- name: Start dnsmasq
+- name: Enable and start dnsmasq
   systemd:
     name: dnsmasq
-    state: restarted
+    state: started
     enabled: yes
