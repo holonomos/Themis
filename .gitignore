@@ -1,13 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.venv
+venv/
+venv.bak/
+
+# Project configuration generated locally
 generated/
 project.yml
-*.box
-*.qcow2
-.vagrant/
-__pycache__/
-*.pyc
-*.pyo
+
+# IDEs and Editors
+.idea/
+.vscode/
 *.swp
 *.swo
-.DS_Store
-.venv/
-venv/
+*~
+.claude/
+.cursor/
+.gemini/
+.antigravity/
+.agent/
+
+# Vagrant
+.vagrant/
+
+# Virtualization / Images
+*.box
+*.qcow2
+*.img
+
+# Diagnostics and Temp
+/tmp/
+audit.py
