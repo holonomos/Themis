@@ -10,7 +10,7 @@ if [[ "${1:-}" == "--package" ]]; then
     OUTPUT="${2:-$DEFAULT_OUTPUT}"
     echo "=== Packaging golden image ==="
     cd "$SCRIPT_DIR"
-    export CLOSWATCH_VAGRANT_BOX="$BOX_NAME"
+    export THEMIS_VAGRANT_BOX="$BOX_NAME"
     vagrant halt golden-strap
     vagrant package golden-strap --output "$OUTPUT"
     echo "Output: $OUTPUT"
@@ -36,7 +36,7 @@ if [[ -n "$BASE_BOX" && -f "$BASE_BOX" ]]; then
 fi
 
 cd "$SCRIPT_DIR"
-export CLOSWATCH_VAGRANT_BOX="$BOX_NAME"
+export THEMIS_VAGRANT_BOX="$BOX_NAME"
 vagrant up golden-strap
 
 if [[ -n "$PROVISION_SCRIPT" ]]; then

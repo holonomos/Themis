@@ -76,15 +76,22 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
             "subnet": link["subnet"]
         })
         
+    reservations = [
+        {"name": node["name"], "ip": node["mgmt_ip"]}
+        for node in topology["nodes"].values()
+    ]
+
     all_vars = {
         "platform": platform["name"],
         "project_name": project_name,
         "mgmt_bridge": mgmt_bridge,
         "mgmt_cidr": topology["management"]["cidr"],
         "mgmt_gateway": topology["management"]["gateway"],
+        "domain": topology["management"]["dns_domain"],
         "wan_interface": project.get("wan_interface", "eth0"),
         "base_image_path": "",
-        "all_links": all_links
+        "all_links": all_links,
+        "reservations": reservations,
     }
     with open(os.path.join(group_vars_dir, "all.yml"), "w", encoding="utf-8") as f:
         yaml.safe_dump(all_vars, f, sort_keys=False)
@@ -100,23 +107,30 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         yaml.safe_dump(control_vars, f, sort_keys=False)
         
     for name, node in topology["nodes"].items():
-        if node["role"] not in ("mgmt", "bastion", "ops", "obs", "artifacts"):
-            hvars = {
-                "role": node["role"],
-                "nos_type": node.get("nos_type") or platform["nos"] if node.get("type") == "frr-vm" else None,
-                "asn": node.get("asn"),
-                "loopback": node.get("loopback"),
-                "vcpu": node.get("vcpu", 1),
-                "memory_mb": node.get("memory_mb", 256),
-                "disk_gb": node.get("disk_gb", 3),
-                "mgmt_mac": node["mgmt_mac"],
-                "interfaces": node.get("interfaces", []),
-                "bgp_neighbors": node.get("bgp_neighbors", [])
-            }
-            if not hvars["nos_type"]:
-                hvars.pop("nos_type")
-            if not hvars["asn"]:
-                hvars.pop("asn")
-                
-            with open(os.path.join(host_vars_dir, f"{name}.yml"), "w", encoding="utf-8") as f:
-                yaml.safe_dump(hvars, f, sort_keys=False)
+        if node["role"] in ("mgmt", "bastion", "ops", "obs", "artifacts"):
+            continue
+
+        if node.get("type") == "frr-vm":
+            nos_type = node.get("nos_type") or platform["nos"]
+        else:
+            nos_type = None
+
+        hvars = {
+            "role": node["role"],
+            "nos_type": nos_type,
+            "asn": node.get("asn"),
+            "loopback": node.get("loopback"),
+            "vcpu": node.get("vcpu", 1),
+            "memory_mb": node.get("memory_mb", 256),
+            "disk_gb": node.get("disk_gb", 3),
+            "mgmt_mac": node["mgmt_mac"],
+            "interfaces": node.get("interfaces", []),
+            "bgp_neighbors": node.get("bgp_neighbors", [])
+        }
+        if not hvars["nos_type"]:
+            hvars.pop("nos_type")
+        if not hvars["asn"]:
+            hvars.pop("asn")
+
+        with open(os.path.join(host_vars_dir, f"{name}.yml"), "w", encoding="utf-8") as f:
+            yaml.safe_dump(hvars, f, sort_keys=False)

@@ -1,0 +1,13 @@
+generated/
+project.yml
+*.box
+*.qcow2
+.vagrant/
+__pycache__/
+*.pyc
+*.pyo
+*.swp
+*.swo
+.DS_Store
+.venv/
+venv/

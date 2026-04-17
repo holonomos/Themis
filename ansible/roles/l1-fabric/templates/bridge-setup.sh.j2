@@ -1,9 +1,8 @@
 #!/bin/bash
-# ClosWatch — Bridge Setup
+# Themis — Bridge Setup (reference script; the l1-fabric Ansible role is authoritative)
 # Generated from topology.yml — DO NOT HAND-EDIT
-# 54 P2P fabric bridges + 1 management bridge.
-# STP disabled on all fabric bridges (L3 routing, not L2 switching).
-# Uses sudo internally for ip link commands. Run as your user.
+# One P2P fabric bridge per link + the libvirt-managed management bridge.
+# STP disabled on fabric bridges (L3 routing, not L2 switching).
 
 set -euo pipefail
 

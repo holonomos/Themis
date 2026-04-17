@@ -15,7 +15,7 @@ def _load_yaml(path: str) -> dict:
 def load_project(path: str) -> dict:
     """Load project.yml. Validate required keys: template, parameters, platform, wan_interface."""
     data = _load_yaml(path)
-    required_keys = {"template", "parameters", "platform", "wan_interface"}
+    required_keys = {"project_name", "template", "parameters", "platform", "wan_interface"}
     missing = required_keys - set(data.keys())
     if missing:
         raise ValueError(f"project.yml is missing required keys: {', '.join(missing)}")
