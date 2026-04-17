@@ -7,6 +7,14 @@
     - role: vm-provision
       tasks_from: destroy-vm
 
+- name: Remove cloud-init seed ISOs
+  hosts: hypervisor
+  gather_facts: no
+  become: yes
+  roles:
+    - role: vm-bootstrap
+      tasks_from: destroy
+
 - name: Remove L1 fabric
   hosts: hypervisor
   gather_facts: no

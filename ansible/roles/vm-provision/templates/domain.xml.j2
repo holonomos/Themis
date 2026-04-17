@@ -18,6 +18,14 @@
       <source file='/var/lib/libvirt/images/{{ vm_name }}.qcow2'/>
       <target dev='vda' bus='virtio'/>
     </disk>
+{% if vm.bootstrap is defined and vm.bootstrap.mode == 'seed' %}
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='{{ seed_image_dir | default("/var/lib/libvirt/images/seeds") }}/{{ vm_name }}-seed.iso'/>
+      <target dev='sda' bus='sata'/>
+      <readonly/>
+    </disk>
+{% endif %}
     <interface type='bridge'>
       <mac address='{{ vm.mgmt_mac }}'/>
       <source bridge='{{ mgmt_bridge }}'/>

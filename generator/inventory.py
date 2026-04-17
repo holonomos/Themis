@@ -98,6 +98,7 @@ def write_inventory(topology: dict, platform: dict, project: dict, out_dir: str)
         "data_cidr": topology["management"]["data_cidr"],
         "data_gateway": topology["management"]["data_gateway"],
         "domain": topology["management"]["dns_domain"],
+        "generator_output_dir": os.path.abspath(out_dir),
         "wan_interface": project.get("wan_interface", "eth0"),
         "base_image_path": project.get("base_image_path") or os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
