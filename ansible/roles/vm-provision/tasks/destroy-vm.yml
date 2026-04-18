@@ -1,7 +1,0 @@
----
-- name: Process each VM for destruction
-  include_tasks: destroy-single-vm.yml
-  loop: "{{ groups['all'] }}"
-  when: "item != 'localhost' and item != '127.0.0.1'"
-  vars:
-    vm_name: "{{ item }}"

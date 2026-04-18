@@ -1,0 +1,33 @@
+[package]
+name = "themisd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Themis daemon — gRPC control plane for fabric labs"
+
+[[bin]]
+name = "themisd"
+path = "src/main.rs"
+
+[dependencies]
+themis-core = { workspace = true }
+themis-proto = { workspace = true }
+themis-compiler = { workspace = true }
+themis-runtime = { workspace = true }
+themis-templates = { workspace = true }
+themis-platforms = { workspace = true }
+tokio = { workspace = true }
+tonic = { workspace = true }
+prost = { workspace = true }
+rusqlite = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+futures = "0.3"
+tokio-util = { version = "0.7", features = ["rt"] }
+tokio-stream = "0.1"

@@ -1,4 +1,0 @@
----
-- include_tasks: node-exporter.yml
-- include_tasks: frr-exporter.yml
-  when: nos_type == 'frr'

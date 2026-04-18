@@ -1,39 +1,9 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-.venv
-venv/
-venv.bak/
+# Rust
+/target/
+**/target/
+**/*.rs.bk
 
-# Project configuration generated locally
-generated/
-project.yml
-
-# IDEs and Editors
+# IDE / editor
 .idea/
 .vscode/
 *.swp
@@ -48,11 +18,15 @@ project.yml
 # Vagrant
 .vagrant/
 
-# Virtualization / Images
+# Images / VMs
 *.box
 *.qcow2
 *.img
 
-# Diagnostics and Temp
-/tmp/
-audit.py
+# OS
+.DS_Store
+Thumbs.db
+
+# Release artifacts
+/THIRD_PARTY_LICENSES
+/dist/

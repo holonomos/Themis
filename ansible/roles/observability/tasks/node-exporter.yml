@@ -1,6 +1,0 @@
----
-- name: Enable and start node-exporter
-  systemd:
-    name: node_exporter
-    state: started
-    enabled: yes

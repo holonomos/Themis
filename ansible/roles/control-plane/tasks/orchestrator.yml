@@ -1,4 +1,0 @@
----
-- name: "orchestrator role is deferred"
-  debug:
-    msg: "control-plane/orchestrator is a scaffold stub (ansible-runner / orchestration host deferred to follow-up)."

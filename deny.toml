@@ -1,0 +1,35 @@
+# cargo-deny policy. See docs/VISION.md and docs/ARCHITECTURE.md for rationale.
+# Themis commits to a fully permissive dependency tree. This file enforces it.
+
+[licenses]
+version = 2
+confidence-threshold = 0.93
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "0BSD",
+    "CC0-1.0",
+    "Unlicense",
+    "Zlib",
+    "Unicode-DFS-2016",
+    "Unicode-3.0",
+]
+# Copyleft licenses are rejected by omission. Any GPL-, LGPL-, AGPL-, or MPL-
+# licensed transitive dependency will fail the build.
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+
+[advisories]
+version = 2
+yanked = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

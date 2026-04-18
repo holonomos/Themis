@@ -1,0 +1,40 @@
+[package]
+name = "themis"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Themis CLI — the command-line client for themisd"
+
+[[bin]]
+name = "themis"
+path = "src/main.rs"
+
+[dependencies]
+themis-proto    = { workspace = true }
+themis-compiler = { workspace = true }
+themis-core     = { workspace = true }
+themis-templates = { workspace = true }
+themis-platforms = { workspace = true }
+tokio           = { workspace = true }
+tonic           = { workspace = true }
+clap            = { workspace = true, features = ["derive", "env"] }
+tracing         = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+anyhow          = { workspace = true }
+serde           = { workspace = true }
+serde_json      = { workspace = true }
+
+# Unix socket gRPC transport
+tower           = { version = "0.4", features = ["util"] }
+hyper-util      = { version = "0.1", features = ["tokio"] }
+
+# Table output
+comfy-table     = "7"
+
+# Shell completions
+clap_complete   = "4"
+
+[dev-dependencies]
+# snapshot testing for diagram golden output

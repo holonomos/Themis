@@ -1,0 +1,22 @@
+[package]
+name = "themis-compiler"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Themisfile → topology → node configs compiler pipeline"
+
+[dependencies]
+themis-core = { workspace = true }
+themis-runtime = { workspace = true }
+themis-templates = { workspace = true }
+themis-platforms = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+kdl = { workspace = true }
+minijinja = { workspace = true }
+tracing = { workspace = true }
+ipnet = { workspace = true }

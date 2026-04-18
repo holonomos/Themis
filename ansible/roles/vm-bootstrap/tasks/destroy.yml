@@ -1,5 +1,0 @@
----
-- name: Remove seed image directory
-  file:
-    path: "{{ seed_image_dir }}"
-    state: absent

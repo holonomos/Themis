@@ -1,5 +1,0 @@
----
-- name: Set node state
-  community.libvirt.virt:
-    command: "{{ 'start' if restore|default(false) else 'destroy' }}"
-    name: "{{ node }}"

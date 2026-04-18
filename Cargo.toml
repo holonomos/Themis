@@ -1,0 +1,79 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/themis-proto",
+    "crates/themis-core",
+    "crates/themis-compiler",
+    "crates/themis-runtime",
+    "crates/themis-templates",
+    "crates/themis-platforms",
+    "crates/themisd",
+    "crates/themis",
+    "crates/themis-tui",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/holonomos/Themis"
+rust-version = "1.75"
+
+[workspace.dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yml = "0.0.10"
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# Observability
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# gRPC / protobuf
+tonic = "0.12"
+tonic-build = "0.12"
+prost = "0.13"
+prost-types = "0.13"
+
+# SQLite (bundled = compiled-in, no external libsqlite3 required)
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# SSH
+russh = "0.45"
+
+# CLI / TUI
+clap = { version = "4", features = ["derive"] }
+ratatui = "0.28"
+crossterm = "0.28"
+
+# Templating / parsing
+minijinja = "2"
+kdl = "6"
+
+# Networking types
+ipnet = { version = "2", features = ["serde"] }
+
+# Async trait sugar
+async-trait = "0.1"
+
+# Internal crate paths
+themis-proto     = { path = "crates/themis-proto" }
+themis-core      = { path = "crates/themis-core" }
+themis-compiler  = { path = "crates/themis-compiler" }
+themis-runtime   = { path = "crates/themis-runtime" }
+themis-templates = { path = "crates/themis-templates" }
+themis-platforms = { path = "crates/themis-platforms" }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+opt-level = 3

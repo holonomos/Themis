@@ -1,7 +1,0 @@
----
-- name: Determine bridge name
-  set_fact:
-    bridge: "{{ (all_links | selectattr('a', 'in', [node_a, node_b]) | selectattr('b', 'in', [node_a, node_b]) | first).bridge }}"
-
-- name: Bring link down
-  command: "ip link set {{ bridge }} down"

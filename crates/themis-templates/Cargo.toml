@@ -1,0 +1,15 @@
+[package]
+name = "themis-templates"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Built-in topology templates: clos-3tier, three-tier, hub-spoke"
+
+[dependencies]
+themis-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+ipnet = { workspace = true }

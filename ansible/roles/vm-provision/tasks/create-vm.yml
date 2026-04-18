@@ -1,7 +1,0 @@
----
-- name: Process each VM
-  include_tasks: create-single-vm.yml
-  loop: "{{ groups['all'] }}"
-  when: "item != 'localhost' and item != '127.0.0.1'"
-  vars:
-    vm_name: "{{ item }}"

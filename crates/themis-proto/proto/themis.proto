@@ -1,0 +1,175 @@
+syntax = "proto3";
+package themis.v1;
+
+// Themis gRPC surface. Populated per docs/ARCHITECTURE.md.
+//
+// Four services, all served by themisd over unix socket:
+//   - LabService     lab lifecycle (define, list, inspect, deploy, destroy)
+//   - RuntimeService runtime control (push-config, chaos, pause, resume)
+//   - StreamService  state subscriptions (events, node state, chaos events)
+//   - DaemonService  daemon itself (health, version, shutdown)
+//
+// This surface will be expanded in Phase 7 as themisd is built; the shape
+// here is enough for downstream crates to depend on.
+
+// ─────────────────────────────────────────────────────────────────────────
+// DaemonService — daemon identity and lifecycle
+// ─────────────────────────────────────────────────────────────────────────
+
+service DaemonService {
+    rpc Health(HealthRequest) returns (HealthResponse);
+    rpc Version(VersionRequest) returns (VersionResponse);
+    rpc Shutdown(ShutdownRequest) returns (ShutdownResponse);
+}
+
+message HealthRequest {}
+message HealthResponse {
+    bool ready = 1;
+}
+
+message VersionRequest {}
+message VersionResponse {
+    string version = 1;
+    string git_commit = 2;
+}
+
+message ShutdownRequest {
+    bool drain = 1;  // finish in-flight work before exiting
+}
+message ShutdownResponse {}
+
+// ─────────────────────────────────────────────────────────────────────────
+// LabService — lab lifecycle
+// ─────────────────────────────────────────────────────────────────────────
+
+service LabService {
+    rpc Define(DefineRequest) returns (DefineResponse);
+    rpc List(ListRequest) returns (ListResponse);
+    rpc Inspect(InspectRequest) returns (InspectResponse);
+    rpc Deploy(DeployRequest) returns (DeployResponse);
+    rpc Destroy(DestroyRequest) returns (DestroyResponse);
+    rpc Estimate(EstimateRequest) returns (EstimateResponse);
+}
+
+enum LabState {
+    LAB_STATE_UNSPECIFIED = 0;
+    LAB_STATE_DEFINED     = 1;
+    LAB_STATE_PROVISIONING = 2;
+    LAB_STATE_RUNNING     = 3;
+    LAB_STATE_PAUSED      = 4;
+    LAB_STATE_DESTROYING  = 5;
+    LAB_STATE_DESTROYED   = 6;
+    LAB_STATE_FAILED      = 7;
+}
+
+message LabSummary {
+    string name = 1;
+    string template = 2;
+    string platform = 3;
+    LabState state = 4;
+    uint32 node_count = 5;
+    int64 created_unix = 6;
+}
+
+message DefineRequest {
+    string themisfile_path = 1;
+    string themisfile_content = 2;  // alternative to path
+}
+message DefineResponse {
+    string name = 1;
+}
+
+message ListRequest {}
+message ListResponse {
+    repeated LabSummary labs = 1;
+}
+
+message InspectRequest {
+    string name = 1;
+}
+message InspectResponse {
+    LabSummary summary = 1;
+    bytes topology_json = 2;  // serialized Topology
+}
+
+message DeployRequest {
+    string name = 1;
+}
+message DeployResponse {}
+
+message DestroyRequest {
+    string name = 1;
+}
+message DestroyResponse {}
+
+message EstimateRequest {
+    string name = 1;
+}
+message EstimateResponse {
+    uint32 total_vcpu = 1;
+    uint64 nominal_memory_mb = 2;
+    uint64 projected_memory_mb_after_ksm = 3;
+    uint64 total_disk_gb = 4;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// RuntimeService — actions against a running lab
+// ─────────────────────────────────────────────────────────────────────────
+
+service RuntimeService {
+    rpc PushConfig(PushConfigRequest) returns (PushConfigResponse);
+    rpc RunChaos(RunChaosRequest) returns (RunChaosResponse);
+    rpc Pause(PauseRequest) returns (PauseResponse);
+    rpc Resume(ResumeRequest) returns (ResumeResponse);
+}
+
+message PushConfigRequest {
+    string lab = 1;
+    repeated string nodes = 2;  // empty = all
+}
+message PushConfigResponse {
+    uint32 nodes_updated = 1;
+}
+
+message RunChaosRequest {
+    string lab = 1;
+    string scenario = 2;  // chaos DSL source
+}
+message RunChaosResponse {
+    string chaos_id = 1;
+}
+
+message PauseRequest  { string lab = 1; }
+message PauseResponse {}
+message ResumeRequest { string lab = 1; }
+message ResumeResponse {}
+
+// ─────────────────────────────────────────────────────────────────────────
+// StreamService — event subscriptions for the TUI
+// ─────────────────────────────────────────────────────────────────────────
+
+service StreamService {
+    rpc SubscribeEvents(SubscribeRequest) returns (stream Event);
+}
+
+message SubscribeRequest {
+    string lab = 1;  // empty = all labs
+    repeated EventKind kinds = 2;  // empty = all kinds
+}
+
+enum EventKind {
+    EVENT_KIND_UNSPECIFIED = 0;
+    EVENT_KIND_LAB_STATE   = 1;
+    EVENT_KIND_NODE_STATE  = 2;
+    EVENT_KIND_CHAOS       = 3;
+    EVENT_KIND_ERROR       = 4;
+}
+
+message Event {
+    int64 timestamp_unix_ns = 1;
+    string lab = 2;
+    EventKind kind = 3;
+    string subject = 4;  // node name, chaos id, etc.
+    string message = 5;
+    bytes payload = 6;   // kind-specific JSON
+}

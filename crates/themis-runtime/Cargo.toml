@@ -1,0 +1,22 @@
+[package]
+name = "themis-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "libvirt / SSH / host-command orchestration for Themis"
+
+[dependencies]
+themis-core = { workspace = true }
+tokio = { workspace = true }
+russh = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+regex = "1"
+tempfile = ">=3.0, <3.14"
+ipnet = { workspace = true }
+base64 = "0.22"
+async-trait = { workspace = true }

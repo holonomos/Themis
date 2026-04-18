@@ -1,0 +1,22 @@
+[package]
+name = "themis-tui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Themis TUI — the terminal UI client for themisd"
+
+[[bin]]
+name = "themis-tui"
+path = "src/main.rs"
+
+[dependencies]
+themis-proto = { workspace = true }
+tokio = { workspace = true }
+tonic = { workspace = true }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }

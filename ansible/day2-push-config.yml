@@ -1,6 +1,0 @@
----
-- name: Re-push NOS configuration
-  hosts: fabric_nodes
-  become: yes
-  roles:
-    - nos-dispatch
